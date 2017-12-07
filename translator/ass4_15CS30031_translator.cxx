@@ -50,7 +50,6 @@ string convertToString (const symbolType* t){
 		return "double";
 	}
 	else if(t->bastype == _MATRIX){
-		dim();
 		return "Matrix(" + intToString(t->row) + ", "+ intToString(t->column) + ")";
 	}
 	else{
@@ -121,7 +120,6 @@ symbolEntry* symbolTable::lookOff(int offset){		//Searches for an element of a M
 			return &table.back();		//Returns a pointer to the reference to the last element in the list container.
 		//}		
 	}
-	dim();
 }
 symbolEntry* gentemp (basicType t, string init){		//generate temperory of basic type t and initial val init
 	char n[20];
@@ -146,12 +144,12 @@ symbolEntry* gentemp (symbolType* t, string init){		//generate temperory of type
 }
 void symbolEntry::printEntry()		//print symbol entry
 {
-	cout<<left<<setw(24)<<this->name;
-	cout<<left<<setw(24)<<convertToString(this->type);
-	cout<<left<<setw(24)<<this->category;
-	cout<<left<<setw(24)<<this->init;
-	cout<<left<<setw(24)<<this->size;
-	cout<<left<<setw(24)<<this->offset;
+	cout<<left<<setw(20)<<this->name;
+	cout<<left<<setw(20)<<convertToString(this->type);
+	cout<<left<<setw(20)<<this->category;
+	cout<<left<<setw(20)<<this->init;
+	cout<<left<<setw(20)<<this->size;
+	cout<<left<<setw(20)<<this->offset;
 	cout<<left;
 	if (this->nestedTable != NULL) {
 		cout << this->nestedTable->tableName <<  endl;
@@ -163,8 +161,8 @@ void symbolEntry::printEntry()		//print symbol entry
 symbolTable::symbolTable (string name): tableName (name), tempCount(0){}		//Constructor of symbolTable
 void symbolTable::print(int all){		//print the symbol table
 	list<symbolTable*> tablelist;
-	cout<<endl<<endl<<endl<<"#####################################PRINTING THE SYMBOL TABLE#################################"<<endl<<endl<<endl;
-	cout<<setw(150)<<setfill ('#')<<"#"<< endl;
+	cout<<endl<<endl<<endl<<".....................................PRINTING THE SYMBOL TABLE................................."<<endl<<endl<<endl;
+	cout<<setw(150)<<setfill ('.')<<"."<< endl;
 	cout<<"Symbol Table: "<<setfill (' ')<<left<<setw(35) <<this -> tableName ;
 	cout<<right<<setw(20)<<"Parent: ";
 	if (this->parent!=NULL)
@@ -172,22 +170,21 @@ void symbolTable::print(int all){		//print the symbol table
 	else cout<<"null" ;
 	cout<<endl;
 	cout<<setw(150)<<setfill ('-')<<"-"<< endl;
-	cout<<setfill (' ')<<left<<setw(16)<<"Name";
-	cout<<left<<setw(24)<<"Type";
-	cout<<left<<setw(24)<<"Category";
-	cout<<left<<setw(24)<<"Init Val";
-	cout<<left<<setw(24)<<"Size";
-	cout<<left<<setw(24)<<"Offset";
+	cout<<setfill (' ')<<left<<setw(20)<<"Name";
+	cout<<left<<setw(20)<<"Type";
+	cout<<left<<setw(20)<<"Category";
+	cout<<left<<setw(20)<<"Init Val";
+	cout<<left<<setw(20)<<"Size";
+	cout<<left<<setw(20)<<"Offset";
 	cout<<left<<"Nested Table"<<endl;
 	cout<<setw(150)<<setfill ('-')<<"-"<< setfill (' ')<<endl;
-	dim();
 	
 	for (list <symbolEntry>::iterator it = table.begin(); it!=table.end(); it++){
 		it->printEntry();
 		if (it->nestedTable!=NULL) tablelist.push_back (it->nestedTable);
 	}
 
-	cout<<setw(150)<<setfill ('#')<<"#"<< setfill (' ')<<endl;
+	cout<<setw(150)<<setfill ('.')<<"."<< setfill (' ')<<endl;
 	cout<<endl;
 	if (all){
 		for (list<symbolTable*>::iterator iterator = tablelist.begin();
@@ -201,27 +198,23 @@ void symbolTable::computeOffsets(){		//compute the offsets of the symbol table e
 	list<symbolTable*> tablelist;
 	int off;
 	int max=0;
-	int size=4;
 	for (list <symbolEntry>::iterator it = table.begin(); it!=table.end(); it++){
 		if (it==table.begin()){
 			it->offset = 0;
-			for (list <symbolEntry>::iterator it2 = table.begin(); it2!=table.end(); it2++){
-				if(it2->offset>max){
-					max=it2->offset;
-					size=it2->size;
-				}
-			}
-			off = max;
-			off += size;
+			off = it->size;
+			//for (list <symbolEntry>::iterator it2 = table.begin(); it2!=table.end(); it2++){
+			//	if(it2->offset>max){
+			//		max=it2->offset;
+			//		size=it2->size;
+			//	}
+			//}
+			//off = max;
+			//off += size;
 		}
 		else{
-			if(it->offset == 0){
 				it->offset = off;	//if offset is already set then leave it
+			if(it->type->bastype != _MATRIX){
 				off = it->offset + it->size;
-				
-			}
-			else{
-
 			}
 		}
 		if (it->nestedTable!=NULL) tablelist.push_back (it->nestedTable);
@@ -251,7 +244,7 @@ symbolEntry::symbolEntry (string name, basicType t, symbolType* ptr, int row, in
 	init = "";
 	category = "";
 	offset = 0;
-	//c = 0;
+	c = 0;
 	isMatrixType = false;
 	size = sizeOfType(type);
 }
@@ -318,11 +311,10 @@ void quadEntry::print (){		//print op code
 	cout<<endl;
 }
 void quads::printTab(){		//print the quad table
-	cout<<endl<<endl<<endl<<"######################################PRINTING THE QUAD TABLE###################################"<<endl<<endl<<endl;
-	cout<<setw(70)<<setfill ('#')<<"#";
+	cout<<endl<<endl<<endl<<"......................................PRINTING THE QUAD TABLE..................................."<<endl<<endl<<endl;
+	cout<<setw(70)<<setfill ('.')<<".";
 	cout<<"Quad Table";
-	dim();
-	cout<<setw(70)<<setfill ('#')<<"#"<<endl;
+	cout<<setw(70)<<setfill ('.')<<"."<<endl;
 	cout<<setw(24)<<setfill (' ')<<"index";
 	cout<<setw(24)<<"result";
 	cout<<setw(24)<<" op";
@@ -336,7 +328,7 @@ void quads::printTab(){		//print the quad table
 		cout<<left<<setw(24)<<it->arg1;
 		cout<<left<<setw(24)<<it->arg2<<endl;
 	}
-	cout<<setw(150)<<setfill ('#')<<"#"<<endl;
+	cout<<setw(150)<<setfill ('.')<<"."<<endl;
 }
 void backpatch (list <int> l, int addr){		//backpatch list l with addr
 	for (list<int>::iterator it= l.begin(); it!=l.end(); it++) quadArr.quadArray[*it].result = intToString(addr);
@@ -344,10 +336,10 @@ void backpatch (list <int> l, int addr){		//backpatch list l with addr
 }
 void quads::print (){		//print all the quad translations
 	
-	cout<<endl<<endl<<endl<<"#############################################PRINTING THE QUAD TRANSLATIONS####################################"<<endl<<endl<<endl;
-	cout<<setw(70)<<setfill ('#')<<"#";
+	cout<<endl<<endl<<endl<<".............................................PRINTING THE QUAD TRANSLATIONS...................................."<<endl<<endl<<endl;
+	cout<<setw(70)<<setfill ('.')<<".";
 	cout<<"Quad Translation";
-	cout<<setw(70)<<setfill ('#')<<"#"<<endl;
+	cout<<setw(70)<<setfill ('.')<<"."<<endl;
 	cout<<setw(150)<<setfill ('-')<<"-"<< setfill (' ')<<endl;
 	for (vector<quadEntry>::iterator it = quadArray.begin(); it!=quadArray.end(); it++){
 		switch (it->op){
@@ -363,7 +355,7 @@ void quads::print (){		//print all the quad translations
 				it->print();
 		}
 	}
-	cout<<setw(150)<<setfill ('#')<<"#"<< endl;
+	cout<<setw(150)<<setfill ('.')<<"."<< endl;
 }
 void emit(opType op, string result, string arg1, string arg2){		//for adding in the quad table
 	quadArr.quadArray.push_back(*(new quadEntry(result,arg1,op,arg2)));
@@ -584,10 +576,6 @@ string intToString(int t) { 		//convert int to string
 
 string charToString(char t) {		//convert char to string
 	return string(1,t);
-}
-
-int dim(){		//return dimensions of Matrix
-	return 2;
 }
 
 string integer2string(int n) {

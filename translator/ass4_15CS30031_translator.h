@@ -12,7 +12,6 @@
 #define SIZEOF_INT 		4
 #define SIZEOF_POINTER		4
 #define SIZEOF_DOUBLE		8
-#define dimension		2
 
 extern char* yytext;
 extern int yyparse();
@@ -103,6 +102,7 @@ public:
 	string category;		//local, temp or global
 	int size;		//Size of the type of symbol
 	int offset;		//Offset of symbol computed at the end
+	int c;
 	symbolTable* nestedTable;		//Pointer to nested symbol table
 	void printEntry();
 	bool isMatrixType;
@@ -230,8 +230,6 @@ string charToString(char);
 expr* convert2bool (expr*);				//convert any expression to bool
 
 expr* convertfrombool (expr*);			//convert bool to expression
-
-int dim();
 
 int chartoascii(char a);
 

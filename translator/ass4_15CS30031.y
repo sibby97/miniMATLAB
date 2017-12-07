@@ -226,8 +226,8 @@ postfix_expression
 				$$->type = new symbolType($$->bastype);
 				if(($3->symbolEntryPointer->init!="")&&($6->symbolEntryPointer->init!="")){
 					$$->loc = gentemp(_INT);		//store computed address
-					table->computeOffsets();
-					int off = $1->symbolEntryPointer->offset;
+					//table->computeOffsets();
+					//int off = $1->symbolEntryPointer->offset;
 
 					symbolEntry *t = gentemp(_INT);
 					t->init = numberToString((stoi($3->symbolEntryPointer->init)-1) * $1->type->column);
@@ -238,12 +238,15 @@ postfix_expression
 					symbolEntry *t2 = gentemp(_INT);
 					t2->init = numberToString(stoi(t1->init) * sizeOfType($$->type));
 		 			emit(MULT, t2->name, t1->name, numberToString(sizeOfType($$->type)));		//$$ should be of type _DOUBLE
-		 			$$->loc->init=numberToString($1->loc->offset+stoi(t2->init));
+		 			//$$->loc->init=numberToString($1->loc->offset+stoi(t2->init));
 					emit (ADD, $$->loc->name, $1->loc->name, t2->name);
+					cout<<"name is\n\n"<<$3->symbolEntryPointer->name<<endl;
+					//$3->symbolEntryPointer->offset = off + $3->symbolEntryPointer->size;
+					//$6->symbolEntryPointer->offset = $3->symbolEntryPointer->offset + $6->symbolEntryPointer->size;
 
-					symbolEntry* t3 = table->lookOff(stoi($$->loc->init));
-						cout<<t3->init<<endl;
-						$$->symbolEntryPointer->init = t3->init;
+					//symbolEntry* t3 = table->lookOff(stoi($$->loc->init));
+					//	cout<<t3->init<<endl;
+					//	$$->symbolEntryPointer->init = t3->init;
 
 				}
 
@@ -855,7 +858,11 @@ assignment_expression
 						emit(EQL, t->name, $3->symbolEntryPointer->name);
 						
 				}
+				else if(curSymEntry->type->bastype == _MATRIX){
+					emit(ARRL, $1->symbolEntryPointer->name, $1->loc->name, $3->symbolEntryPointer->name);
+				}
 				else{
+					//cout<<curSymEntry->type->bastype<<endl<<endl;
 					switch ($1->bastype) {
 						case _ARR:
 							$3->symbolEntryPointer = convert($3->symbolEntryPointer, $1->type->bastype);
@@ -863,6 +870,10 @@ assignment_expression
 							break;
 						case _PTR:
 							emit(PTRL, $1->symbolEntryPointer->name, $3->symbolEntryPointer->name);	
+							break;
+
+						case _MATRIX:
+							emit(ARRL, $1->symbolEntryPointer->name, $1->loc->name, $3->symbolEntryPointer->name);
 							break;
 						
 						default:
@@ -1076,6 +1087,9 @@ direct_declarator
 					$1->type->row = atoi($3->symbolEntryPointer->init.c_str());
 						$1->type->column = atoi($6->symbolEntryPointer->init.c_str());
 						$$ = $1->update ($1->type);
+						table->computeOffsets();
+					//$3->symbolEntryPointer->offset = $1->offset;
+					//$6->symbolEntryPointer->offset = $3->symbolEntryPointer->offset + $3->symbolEntryPointer->size;
 
 				printf("direct-declarator: direct-declarator [ assignment-expression ] [ asignment-expression ]\n");
 			}
@@ -1235,10 +1249,10 @@ initializer
 			{ 
 				$$ = $1->symbolEntryPointer;
 				if(TYPE == _MATRIX){
-					table->computeOffsets();
+					//table->computeOffsets();
 					$$->type->bastype = _DOUBLE;
 					$$->size = SIZEOF_DOUBLE;
-					$$->offset = curSymEntry->offset + (2*SIZEOF_INT) + (curSymEntry->c * SIZEOF_DOUBLE);
+					//$$->offset = curSymEntry->offset + (2*SIZEOF_INT) + (curSymEntry->c * SIZEOF_DOUBLE);
 					emit(ARRL, curSymEntry->name, numberToString(curSymEntry->c), $$->name);
 					curSymEntry->c++;
 					//cout<<curSymEntry->c<<endl;
